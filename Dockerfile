@@ -4,3 +4,4 @@ ffmpeg
 ffprobe
 openai
 tiktoken
+threading

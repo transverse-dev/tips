@@ -80,7 +80,7 @@ def GPTf(
     # summary_history = get_summary_history(history_list)
 
     gpt_messages = [
-        {"role": "system", "content": "회의 내용을 한국어로 요약하는 서기 챗봇입니다. 이전 회의내용을 참고하여 현재 회의내용을 요약하세요."},
+        {"role": "system", "content": "회의 내용을 한국어로 요약하는 서기 챗봇입니다. 숫자를 명시하고 자세하게 현재 회의내용을 요약하세요."},
         {"role": 'assistant', 'content': '이전 회의내용: ' + selected_text_history},
         {"role": "user", "content": "현재 회의내용: " + query}
     ]
@@ -92,6 +92,6 @@ def GPTf(
         messages=gpt_messages,
         temperature=0)
 
-    print(chatbot_response)
+    # print(chatbot_response)
 
     return chatbot_response.choices[0].message.content
