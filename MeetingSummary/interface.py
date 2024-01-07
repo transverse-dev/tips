@@ -43,26 +43,28 @@ def summarySpeech(stream, new_chunk):
     return stream, summary
         
 
+with gr.Blocks() as demo:
+    with gr.Row():
+        state = gr.State()
+        input_audio = gr.Audio(
+            sources=["microphone", 'upload'],
+            waveform_options=gr.WaveformOptions(
+                waveform_color="#01C6FF",
+                waveform_progress_color="#0066B4",
+                skip_length=2,
+                show_controls=False,
+            ),
+            # streaming=True,
+        )
+        output = gr.Text()
+        input_audio.stream(summarySpeech, [state, input_audio], [state, output])
 
-input_audio = gr.Audio(
-    sources=["microphone", 'upload'],
-    waveform_options=gr.WaveformOptions(
-        waveform_color="#01C6FF",
-        waveform_progress_color="#0066B4",
-        skip_length=2,
-        show_controls=False,
-    ),
-    streaming=True,
-)
-
-
-# 우선 클릭해서 녹음하는 형태로 Start. 나중에 Streaming 형태로 만들자.
-demo = gr.Interface(
-    fn=summarySpeech,
-    inputs=["state", input_audio],
-    outputs=["state","text"],
-    live=True,
-)
+# demo = gr.Interface(
+#     fn=summarySpeech,
+#     inputs=["state", input_audio],
+#     outputs=["state","text"],
+#     live=True,
+# )
 
 if __name__ == "__main__":
     demo.launch()
