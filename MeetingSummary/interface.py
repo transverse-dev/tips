@@ -59,12 +59,5 @@ with gr.Blocks() as demo:
         output = gr.Text()
         input_audio.stream(summarySpeech, [state, input_audio], [state, output])
 
-# demo = gr.Interface(
-#     fn=summarySpeech,
-#     inputs=["state", input_audio],
-#     outputs=["state","text"],
-#     live=True,
-# )
-
 if __name__ == "__main__":
     demo.launch()

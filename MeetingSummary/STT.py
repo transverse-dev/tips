@@ -20,6 +20,6 @@ def chunk_processing(new_chunk):
 # 국내 유료 STT 모델 API를 사용하면 성능 향상.
 # whisper를 직접 fine tuning 하는 방법도 있음.
 def transcribe(sr, stream):
-    # transcriber = pipeline("automatic-speech-recognition", model="openai/whisper-large-v2")
-    transcriber = pipeline("automatic-speech-recognition", model="openai/whisper-base")
+    transcriber = pipeline("automatic-speech-recognition", model="openai/whisper-large-v2")
+    # transcriber = pipeline("automatic-speech-recognition", model="openai/whisper-base")
     return transcriber({"sampling_rate": sr, "raw": stream})["text"]
