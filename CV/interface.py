@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import dlib
+from gaze_tracking.gaze_tracking import GazeTracking
 
 def print_face(facial_landmarks, _gray, _frame):
     face_region = np.array([(facial_landmarks.part(0).x, facial_landmarks.part(0).y),
@@ -32,21 +33,34 @@ def main():
     # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    gaze = GazeTracking()
 
     while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("Failed to capture frame")
-            break
+        _, frame = cap.read()
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # gaze_tracking
+        gaze.refresh(frame)
+        new_frame = gaze.annotated_frame()
+        text = ""
+
+        if gaze.is_right():
+            text = "Looking right"
+        elif gaze.is_left():
+            text = "Looking left"
+        elif gaze.is_center():
+            text = "Looking center"
+
+        cv2.putText(new_frame, text, (60, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2)
+        
+        # face_landmark
+        gray = cv2.cvtColor(new_frame, cv2.COLOR_BGR2GRAY)
         faces = detector(gray)
-        face = faces[0]
 
-        landmarks = predictor(gray, face)
-        print_face(landmarks, gray, frame)
-
-        cv2.imshow("Webcam", frame)
+        for face in faces:
+            landmarks = predictor(gray, face)
+            print_face(landmarks, gray, new_frame)
+        
+        cv2.imshow("Demo", new_frame)
 
         # 'q' 키를 누르면 종료
         if cv2.waitKey(1) & 0xFF == ord('q'):
