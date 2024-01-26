@@ -1,5 +1,4 @@
 from __future__ import division
-import os
 import cv2
 import dlib
 from .eye import Eye
@@ -97,7 +96,8 @@ class GazeTracking(object):
     def is_right(self):
         """Returns true if the user is looking to the right"""
         if self.pupils_located:
-            return self.horizontal_ratio() <= 0.35
+            # 오른쪽 인식이 안되어서 값을 늘렸습니다. 수학적인 문제가 있는 것으로 추정됩니다.
+            return self.horizontal_ratio() <= 0.4 
 
     def is_left(self):
         """Returns true if the user is looking to the left"""

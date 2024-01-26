@@ -42,6 +42,8 @@ class Eye(object):
             landmarks (dlib.full_object_detection): Facial landmarks for the face region
             points (list): Points of an eye (from the 68 Multi-PIE landmarks)
         """
+
+        # self.landmark_points에 x, y 위치 저장
         region = np.array([(landmarks.part(point).x, landmarks.part(point).y) for point in points])
         region = region.astype(np.int32)
         self.landmark_points = region

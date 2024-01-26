@@ -1,65 +1,28 @@
 import cv2
-import numpy as np
-import dlib
 from gaze_tracking.gaze_tracking import GazeTracking
-
-def print_face(facial_landmarks, _gray, _frame):
-    face_region = np.array([(facial_landmarks.part(0).x, facial_landmarks.part(0).y),
-                            (facial_landmarks.part(1).x, facial_landmarks.part(1).y),
-                            (facial_landmarks.part(2).x, facial_landmarks.part(2).y),
-                            (facial_landmarks.part(3).x, facial_landmarks.part(3).y),
-                            (facial_landmarks.part(4).x, facial_landmarks.part(4).y),
-                            (facial_landmarks.part(5).x, facial_landmarks.part(5).y),
-                            (facial_landmarks.part(6).x, facial_landmarks.part(6).y),
-                            (facial_landmarks.part(7).x, facial_landmarks.part(7).y),
-                            (facial_landmarks.part(8).x, facial_landmarks.part(8).y),
-                            (facial_landmarks.part(9).x, facial_landmarks.part(9).y),
-                            (facial_landmarks.part(10).x, facial_landmarks.part(10).y),
-                            (facial_landmarks.part(11).x, facial_landmarks.part(11).y),
-                            (facial_landmarks.part(12).x, facial_landmarks.part(12).y),
-                            (facial_landmarks.part(13).x, facial_landmarks.part(13).y),
-                            (facial_landmarks.part(14).x, facial_landmarks.part(14).y),
-                            (facial_landmarks.part(15).x, facial_landmarks.part(15).y),
-                            (facial_landmarks.part(16).x, facial_landmarks.part(16).y),
-                            (facial_landmarks.part(18).x, facial_landmarks.part(18).y),
-                            (facial_landmarks.part(23).x, facial_landmarks.part(23).y)], np.int32)
-
-    cv2.polylines(_frame, [face_region], True, (0, 255, 255), 1)
+from warning import print_face, print_jawline
 
 def main():
 
     cap = cv2.VideoCapture(0)
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     gaze = GazeTracking()
 
     while True:
         _, frame = cap.read()
 
-        # gaze_tracking
+        # gaze_tracking 눈동자 표시
         gaze.refresh(frame)
         new_frame = gaze.annotated_frame()
-        text = ""
 
-        if gaze.is_right():
-            text = "Looking right"
-        elif gaze.is_left():
-            text = "Looking left"
-        elif gaze.is_center():
-            text = "Looking center"
-
-        cv2.putText(new_frame, text, (60, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2)
+        # 눈동자 좌/우 편향시 빨간색으로 얼굴 표시
+        if gaze.is_right() or gaze.is_left():
+            print_face(new_frame)
         
-        # face_landmark
-        gray = cv2.cvtColor(new_frame, cv2.COLOR_BGR2GRAY)
-        faces = detector(gray)
+        # 고개가 돌아가면 보라색으로 표시
+        print_jawline(new_frame)
 
-        for face in faces:
-            landmarks = predictor(gray, face)
-            print_face(landmarks, gray, new_frame)
-        
         cv2.imshow("Demo", new_frame)
 
         # 'q' 키를 누르면 종료
