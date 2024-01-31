@@ -1,6 +1,9 @@
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
+CV/__pycache__/
+CV/gazeTracking/__pycache__/
+MeetingSummary/__pycache__/
 *.py[cod]
 *$py.class
 

@@ -1,6 +1,5 @@
 from __future__ import division
 import cv2
-import dlib
 from .eye import Eye
 from .calibration import Calibration
 
@@ -14,15 +13,11 @@ class GazeTracking(object):
 
     def __init__(self):
         self.frame = None
+        self.face = None
+        self.facial_landmark = None
         self.eye_left = None
         self.eye_right = None
         self.calibration = Calibration()
-
-        # _face_detector is used to detect faces
-        self._face_detector = dlib.get_frontal_face_detector()
-
-        # _predictor is used to get facial landmarks of a given face
-        self._predictor = dlib.shape_predictor("CV\shape_predictor_68_face_landmarks.dat")
 
     @property
     def pupils_located(self):
@@ -36,28 +31,26 @@ class GazeTracking(object):
         except Exception:
             return False
 
-    def _analyze(self):
+    def _analyze(self, face, facial_landmark):
         """Detects the face and initialize Eye objects"""
         frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-        faces = self._face_detector(frame)
 
         try:
-            landmarks = self._predictor(frame, faces[0])
-            self.eye_left = Eye(frame, landmarks, 0, self.calibration)
-            self.eye_right = Eye(frame, landmarks, 1, self.calibration)
+            self.eye_left = Eye(frame, facial_landmark, 0, self.calibration)
+            self.eye_right = Eye(frame, facial_landmark, 1, self.calibration)
 
         except IndexError:
             self.eye_left = None
             self.eye_right = None
 
-    def refresh(self, frame):
+    def refresh(self, frame, face, facial_landmark):
         """Refreshes the frame and analyzes it.
 
         Arguments:
             frame (numpy.ndarray): The frame to analyze
         """
         self.frame = frame
-        self._analyze()
+        self._analyze(face, facial_landmark)
 
     def pupil_left_coords(self):
         """Returns the coordinates of the left pupil"""
