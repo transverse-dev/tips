@@ -1,5 +1,5 @@
 import cv2
-from gaze_tracking.gaze_tracking import GazeTracking
+from gazeTracking.gazeTracking import GazeTracking
 from warning import print_face, print_jawline
 
 def main():

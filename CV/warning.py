@@ -2,12 +2,14 @@ import dlib
 import numpy as np
 import cv2
 
+
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor("CV\shape_predictor_68_face_landmarks.dat")
+
 def distance(point1, point2):
     return np.sqrt((point2[0] - point1[0])**2 + (point2[1] - point1[1])**2)
 
 def print_jawline(_frame):
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     gray = cv2.cvtColor(_frame, cv2.COLOR_BGR2GRAY)
     faces = detector(gray)
     if not faces:
@@ -44,8 +46,6 @@ def print_jawline(_frame):
     return
     
 def print_face(_frame):
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
     gray = cv2.cvtColor(_frame, cv2.COLOR_BGR2GRAY)
     faces = detector(gray)
     if not faces:
