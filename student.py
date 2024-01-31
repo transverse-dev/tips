@@ -1,28 +1,24 @@
-import threading
+import av
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer
+from MeetingSummary.main import MeetingSummary
 
-st.title("CV Demo")
+ms = MeetingSummary()
+
+st.title("Audio Demo")
 st.write("Student screen")
 
-lock = threading.Lock()
-img_container = {"img": None}
-
-
-def video_frame_callback(frame):
-    img = frame.to_ndarray(format="bgr24")
-    with lock:
-        img_container["img"] = img
-
+def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
     return frame
 
-ctx = webrtc_streamer(key="example", video_frame_callback=video_frame_callback)
+def audio_frame_callback(frame: av.AudioFrame) -> av.AudioFrame:
+    if ms.recording(frame.sample_rate, frame.to_ndarray()) : # sample_rate, raw_sound
+            ms.summary() # return 값이 True일 경우 실행 = 10000개 chunk마다 실행
+            st.write(ms.translated_txt)
+            st.empty()
+            st.write(ms.summarized_txt)
+    
 
-fig_place = st.empty()
-
-while ctx.state.playing:
-    with lock:
-        img = img_container["img"]
-    if img is None:
-        continue
-    ### 아래 화면 추가(while doing)
+ctx = webrtc_streamer(key="example", 
+                      video_frame_callback=video_frame_callback,
+                      audio_frame_callback=audio_frame_callback)

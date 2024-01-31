@@ -4,10 +4,6 @@ import tiktoken
 
 ## OpenAI API 키 설정 -> 환경변수로 OPENAI_API_KEY 설정 or 메모장에 작성
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-# f = open('openai_key.txt', 'r')
-# KEY = f.readline()
-# openai.api_key = KEY
-
 
 # models
 EMBEDDING_MODEL = "text-embedding-ada-002"
@@ -34,36 +30,7 @@ def get_history_messages(
             break
     return selected_text_history
 
-###############################
-### 회의내용 요약 필요시 추가 ###
-###############################
-# def get_summary_history(
-#         history_list: list,
-#         model: str = GPT_MODEL
-# ) -> str:
-#     if history_list == []:
-#         return ""
-#     gpt_messages = [
-#         {'role': 'system', 'content': '사용자와 "assistant"의 모든 대화를 한 문단으로 요약하여 설명하는 "assistant"입니다. 300자 내로 설명해주세요. 출처는 포함하지 않습니다.'}
-#     ]
-#     for history in history_list[-1:-6:-1]:
-#         for h, r in zip(history, ['user', 'assistant']):
-#             gpt_messages.append({
-#                 'role': r,
-#                 'content': h
-#             })
-#     gpt_messages.append({
-#         'role': 'user',
-#         'content': '지금까지 대화를 요약해줘'
-#     })
-#     summary_history = openai.ChatCompletion.create(
-#         model=model,
-#         messages=gpt_messages,
-#         temperature=0.15
-#     )
-#     return summary_history['choices'][0]['message']['content']
-
-def GPTf(
+def askGPT(
         query: str,
         text_history: list,
         model: str = GPT_MODEL,
@@ -75,9 +42,6 @@ def GPTf(
         text_history=text_history,
         history_token_budget=token_budget - 500
     )
-
-    # 히스토리 요약 500토큰 이내로 ~ 500자 정도
-    # summary_history = get_summary_history(history_list)
 
     gpt_messages = [
         {"role": "system", "content": "회의 내용을 한국어로 요약하는 서기 챗봇입니다. 회의내용 텍스트가 정확하지 않을 수 있습니다. 회의내용을 유추하여 현재 회의내용을 요약하세요."},

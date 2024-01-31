@@ -1,6 +1,6 @@
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer
-from CV.interface import CV
+from CV.main import CV
 import av
 
 st.title("CV Demo")
