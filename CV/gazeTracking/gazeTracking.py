@@ -90,12 +90,12 @@ class GazeTracking(object):
         """Returns true if the user is looking to the right"""
         if self.pupils_located:
             # 오른쪽 인식이 안되어서 값을 늘렸습니다. 수학적인 문제가 있는 것으로 추정됩니다.
-            return self.horizontal_ratio() <= 0.4 
+            return self.horizontal_ratio() <= 0.4
 
     def is_left(self):
         """Returns true if the user is looking to the left"""
         if self.pupils_located:
-            return self.horizontal_ratio() >= 0.65
+            return self.horizontal_ratio() >= 0.7
 
     def is_center(self):
         """Returns true if the user is looking to the center"""

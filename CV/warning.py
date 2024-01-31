@@ -19,11 +19,11 @@ class Warning:
         right_jawline_length = self.distance(right_jawline[0], right_jawline[1])
         left_jawline_length = self.distance(left_jawline[0], left_jawline[1])
         #왼쪽을 보고 있으면 왼쪽 턱선을 빨간색으로 출력합니다.
-        if left_jawline_length / right_jawline_length < 0.75:
+        if left_jawline_length / right_jawline_length < 0.7:
             cv2.polylines(self.frame, [right_jawline], True, (0, 255, 0), 3)
             cv2.polylines(self.frame, [left_jawline], True, (255, 0, 255), 3)
         #오른쪽을 보고 있으면 오른쪽 턱선을 빨간색으로 출력합니다.
-        elif right_jawline_length / left_jawline_length < 0.75:
+        elif right_jawline_length / left_jawline_length < 0.7:
             cv2.polylines(self.frame, [right_jawline], True, (255, 0, 255), 3)
             cv2.polylines(self.frame, [left_jawline], True, (0, 255, 0), 3)
         #정면을 보고 있으면 양쪽 턱선을 초록색으로 출력합니다.
