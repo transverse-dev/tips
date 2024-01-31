@@ -14,13 +14,6 @@ def main():
     predictor = dlib.shape_predictor("CV\shape_predictor_68_face_landmarks.dat")
 
     while True:
-
-        """
-        [중복 제거]
-        - 얼굴 사진 크롭
-        - face_landmark
-        """
-
         _, frame = cap.read()
         new_frame = frame
 
