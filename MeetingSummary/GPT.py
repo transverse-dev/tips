@@ -1,61 +1,63 @@
-import os
+from os import getenv
 from openai import OpenAI
-import tiktoken
-
-## OpenAI API 키 설정 -> 환경변수로 OPENAI_API_KEY 설정 or 메모장에 작성
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-
-# models
-EMBEDDING_MODEL = "text-embedding-ada-002"
-GPT_MODEL = "gpt-3.5-turbo"
+from tiktoken import encoding_for_model
 
 
-def num_tokens(text: str, model: str = GPT_MODEL) -> int:
-    # 문자열 토큰 수 반환
-    encoding = tiktoken.encoding_for_model(model)
-    return len(encoding.encode(text))
+class GPT(object):
+    def __init__(self):
+        # OpenAI API 키 설정 -> 환경변수로 OPENAI_API_KEY 설정
+        self.OPENAI_API_KEY = getenv('OPENAI_API_KEY')
 
+        # models
+        self.EMBEDDING_MODEL = "text-embedding-ada-002"
+        self.GPT_MODEL = "gpt-3.5-turbo"
 
-def get_history_messages(
-        text_history: list,
-        history_token_budget: int
-) -> str:
-    # 토큰 제한 안에서 history 최신 순으로 가져옴
-    selected_text_history = ""
-    for conversation in text_history[::-1]:
-        next_conv = f"{conversation}\n"
-        if num_tokens(selected_text_history + next_conv) < history_token_budget:
-            selected_text_history += next_conv
-        else:
-            break
-    return selected_text_history
+        # args
+        self.token_budget = 4096 - 1024
+        self.text_history = []
+        self.query = None
 
-def askGPT(
-        query: str,
-        text_history: list,
-        model: str = GPT_MODEL,
-        token_budget: int = 4096 - 1000,
-) -> object:
+    def num_tokens(self) -> int:
+        # 문자열 토큰 수 반환
+        encoding = encoding_for_model(self.GPT_MODEL)
+        return len(encoding.encode(self.query))
+    
+    def get_history_messages(self) -> str:
+        # 토큰 제한 안에서 history 최신 순으로 가져옴
+        selected_text_history = ""
+        for conversation in self.text_history[::-1]:
+            next_conv = f"{conversation}\n"
+            if self.num_tokens(selected_text_history + next_conv) < self.history_token_budget:
+                selected_text_history += next_conv
+            else:
+                break
+        return selected_text_history
 
-    # 데이터프레임과 임베딩을 활용해 GPT로 쿼리 응답 반환
-    selected_text_history = get_history_messages(
-        text_history=text_history,
-        history_token_budget=token_budget - 500
-    )
+    def askGPT(
+        self,
+        query: str
+    ) -> str:
+        
+        # 질의 저장
+        self.query = query
 
-    gpt_messages = [
-        {"role": "system", "content": "회의 내용을 한국어로 요약하는 서기 챗봇입니다. 회의내용 텍스트가 정확하지 않을 수 있습니다. 회의내용을 유추하여 현재 회의내용을 요약하세요."},
-        {"role": 'assistant', 'content': '이전 회의내용: ' + selected_text_history},
-        {"role": "user", "content": "현재 회의내용: " + query}
-    ]
+        # 데이터프레임과 임베딩을 활용해 GPT로 쿼리 응답 반환
+        selected_text_history = self.get_history_messages()
 
-    client = OpenAI(api_key=OPENAI_API_KEY)
+        gpt_messages = [
+            {"role": "system", "content": "회의 내용을 한국어로 요약하는 서기 챗봇입니다. 현재 회의내용을 정확하게 요약하세요."},
+            {"role": 'assistant', 'content': '이전 회의내용: ' + selected_text_history},
+            {"role": "user", "content": "현재 회의내용: " + query}
+        ]
 
-    chatbot_response = client.chat.completions.create(
-        model=model, 
-        messages=gpt_messages,
-        temperature=0)
+        client = OpenAI(api_key=self.OPENAI_API_KEY)
 
-    # print(chatbot_response)
+        chatbot_response = client.chat.completions.create(
+            model=self.GPT_MODEL, 
+            messages=gpt_messages,
+            temperature=0)
+        
+        # text_history 저장
+        self.text_history.append(query)
 
-    return chatbot_response.choices[0].message.content
+        return chatbot_response.choices[0].message.content

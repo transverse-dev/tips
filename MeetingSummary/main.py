@@ -1,7 +1,7 @@
 
 import numpy as np
 from transformers import pipeline
-from .GPT import askGPT
+from .GPT import GPT
 
 class MeetingSummary:
     """
@@ -16,29 +16,24 @@ class MeetingSummary:
     def __init__(self):
         # STT model instance
         self.transcriber = pipeline("automatic-speech-recognition", model="openai/whisper-large-v2")
+        # GPT model instance
+        self.GPT = GPT()
         # args
-        self._txt_history = []
         self.summarized_txt = "Recording"
         self.translated_txt = "Recording"
         self.stream = None
         self.sr = None
-
-    def STT(self):
-        self.translated_txt = self.transcriber({"sampling_rate": self.sr, "raw": self.stream})["text"]
-        self._txt_history.append(self.translated_txt)
     
     def chunk_processing(y):
         y = y.astype(np.float32)
         y /= np.max(np.abs(y))    
         return y
 
-    def LLM(self):
-        self.summarized_txt = askGPT(self.translated_txt, 
-                                     self._txt_history)
-
     def summary(self):
-        self.STT()
-        self.LLM()
+        # STT
+        self.translated_txt = self.transcriber({"sampling_rate": self.sr, "raw": self.stream})["text"]
+        # LLM
+        self.summarized_txt = self.GPT.askGPT(self.translated_txt)
     
     def recording(self, sr, new_chunk):
         self.sr = sr
