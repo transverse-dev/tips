@@ -13,7 +13,8 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
 
 def audio_frame_callback(frame: av.AudioFrame) -> av.AudioFrame:
     if ms.recording(frame.sample_rate, frame.to_ndarray()) : # sample_rate, raw_sound
-            ms.summary() # return 값이 True일 경우 실행 = 10000개 chunk마다 실행
+            # ms.summary() # return 값이 True일 경우 실행 = 10000개 chunk마다 실행
+            print(frame.sample_rate, frame.to_ndarray())
             print(ms.translated_txt)
             print()
             print(ms.summarized_txt)
