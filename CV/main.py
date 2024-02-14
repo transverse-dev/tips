@@ -22,13 +22,11 @@ def CV(frame):
     # Eyetracking & 고개각도
     if facial_landmarks:
         gaze.refresh(frame, faces[0], facial_landmarks[0])
-        # gaze_tracking 눈동자 표시
-        frame = gaze.annotated_frame()
         warning.refresh(frame, faces[0], facial_landmarks[0])
-        # 눈동자 좌/우 편향시 빨간색으로 얼굴 표시
+        # 눈동자 좌/우 편향시 파란색 테두리 표시
         if gaze.is_right() or gaze.is_left():
             frame = warning.eyetracking_warning()
-        # 턱선 좌/우 편향시 표시
+        # 턱선 좌/우 편향시 빨간색 테두리 표시
         frame = warning.jawline_warning()
 
     return frame

@@ -18,19 +18,10 @@ class Warning:
     def print_jawline(self, right_jawline, left_jawline):
         right_jawline_length = self.distance(right_jawline[0], right_jawline[1])
         left_jawline_length = self.distance(left_jawline[0], left_jawline[1])
-        #왼쪽을 보고 있으면 왼쪽 턱선을 빨간색으로 출력합니다.
-        if left_jawline_length / right_jawline_length < 0.7:
-            cv2.polylines(self.frame, [right_jawline], True, (0, 255, 0), 3)
-            cv2.polylines(self.frame, [left_jawline], True, (255, 0, 255), 3)
-        #오른쪽을 보고 있으면 오른쪽 턱선을 빨간색으로 출력합니다.
-        elif right_jawline_length / left_jawline_length < 0.7:
-            cv2.polylines(self.frame, [right_jawline], True, (255, 0, 255), 3)
-            cv2.polylines(self.frame, [left_jawline], True, (0, 255, 0), 3)
-        #정면을 보고 있으면 양쪽 턱선을 초록색으로 출력합니다.
-        else:
-            cv2.polylines(self.frame, [right_jawline], True, (0, 255, 0), 3)
-            cv2.polylines(self.frame, [left_jawline], True, (0, 255, 0), 3)
-        return
+        #왼쪽 또는 오른쪽 보고 있으면 왼쪽 턱선을 빨간색으로 출력합니다.
+        if left_jawline_length / right_jawline_length < 0.7 or right_jawline_length / left_jawline_length < 0.7:
+            height, width = self.frame.shape[:2]
+            self.frame = cv2.rectangle(self.frame, (0, 0), (width-1, height-1), (0, 0, 255), 5)
 
     def jawline_warning(self):
         ## 턱선
@@ -43,29 +34,11 @@ class Warning:
                                 (self.facial_landmark.part(2).x, self.facial_landmark.part(2).y)], np.int32)
         left_jawline = np.array([(self.facial_landmark.part(33).x, self.facial_landmark.part(33).y),
                                 (self.facial_landmark.part(14).x, self.facial_landmark.part(14).y)], np.int32)
-
         self.print_jawline(right_jawline, left_jawline)
         return self.frame
     
     def eyetracking_warning(self):
-        face_region = np.array([(self.facial_landmark.part(0).x, self.facial_landmark.part(0).y),
-                                (self.facial_landmark.part(1).x, self.facial_landmark.part(1).y),
-                                (self.facial_landmark.part(2).x, self.facial_landmark.part(2).y),
-                                (self.facial_landmark.part(3).x, self.facial_landmark.part(3).y),
-                                (self.facial_landmark.part(4).x, self.facial_landmark.part(4).y),
-                                (self.facial_landmark.part(5).x, self.facial_landmark.part(5).y),
-                                (self.facial_landmark.part(6).x, self.facial_landmark.part(6).y),
-                                (self.facial_landmark.part(7).x, self.facial_landmark.part(7).y),
-                                (self.facial_landmark.part(8).x, self.facial_landmark.part(8).y),
-                                (self.facial_landmark.part(9).x, self.facial_landmark.part(9).y),
-                                (self.facial_landmark.part(10).x, self.facial_landmark.part(10).y),
-                                (self.facial_landmark.part(11).x, self.facial_landmark.part(11).y),
-                                (self.facial_landmark.part(12).x, self.facial_landmark.part(12).y),
-                                (self.facial_landmark.part(13).x, self.facial_landmark.part(13).y),
-                                (self.facial_landmark.part(14).x, self.facial_landmark.part(14).y),
-                                (self.facial_landmark.part(15).x, self.facial_landmark.part(15).y),
-                                (self.facial_landmark.part(16).x, self.facial_landmark.part(16).y),
-                                (self.facial_landmark.part(24).x, self.facial_landmark.part(18).y),
-                                (self.facial_landmark.part(19).x, self.facial_landmark.part(23).y)], np.int32)
-        cv2.polylines(self.frame, [face_region], True, (0, 0, 255), 5)
+        height, width = self.frame.shape[:2]
+        self.frame = cv2.rectangle(self.frame, (5, 5), (width-6, height-6), (255, 0, 0), 3)
         return self.frame
+    

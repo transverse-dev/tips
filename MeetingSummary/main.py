@@ -1,4 +1,4 @@
-
+import torch
 import numpy as np
 import time
 from transformers import pipeline
@@ -16,8 +16,11 @@ class MeetingSummary:
     """
     def __init__(self):
         # STT model instance
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         self.transcriber = pipeline("automatic-speech-recognition", 
-                                    model="openai/whisper-large-v2")
+                                    model="openai/whisper-large-v2",
+                                    chunk_length_s=30,
+                                    device=device)
         # GPT model instance
         self.GPT = GPT()
         # args
@@ -34,7 +37,8 @@ class MeetingSummary:
 
     def summary(self):
         # STT
-        self.translated_txt = self.transcriber({"sampling_rate": self.sr, "raw": self.stream})["text"]
+        self.translated_txt = self.transcriber({"sampling_rate": self.sr, "raw": self.stream}
+                                               , batch_size=8)["text"]
         self.stream = None
         # LLM
         self.summarized_txt = self.GPT.askGPT(self.translated_txt)
@@ -45,7 +49,8 @@ class MeetingSummary:
         
         # 말 단위 조합해서 문장 만들기
         if self.stream is not None:
-            self.stream = np.concatenate([self.stream, y])
+            # self.stream = np.concatenate([self.stream, y])
+            pass
         else:
             self.timer_start = time.time() # 초시계 Start
             self.stream = y
@@ -64,41 +69,3 @@ class MeetingSummary:
         #     return True     #recording 반환 값이 True면 summary 실행
         # else:
             # return False    #recording 반환 값이 False면 Pass
-        
-
-##### chunk Timer 도달 시 chunk recording 멈춤 현상 해결 필요
-
-
-#######################
-# Class 변환 이전 코드 #
-#######################
-# def STTandGPT(sr, stream):
-#     # stt 실행
-#     stt = transcribe(sr, stream)
-#     TEXT_HISTORY.append(stt)
-#     summary = GPTf(stt, TEXT_HISTORY)
-
-#     print("stt 실행: ", len(stream))
-#     print(stt)              ## STT 성능 확인용
-#     return None, summary
-    
-
-# def summarySpeech(stream, new_chunk):
-#     global summary
-
-#     # 청크 소리파형 전처리
-#     sr, y = chunk_processing(new_chunk)
-
-#     # 말 단위 조합해서 문장 만들기
-#     if stream is not None:
-#         stream = np.concatenate([stream, y])
-#     else:
-#         stream = y
-
-#     print(len(stream))
-
-#     if len(stream) >= 2400000: #24000Hz * 100
-#         # 5초마다 타이머 실행
-#         stream, summary = STTandGPT(sr, stream)
-
-#     return stream, summary
