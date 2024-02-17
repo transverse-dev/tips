@@ -5,24 +5,18 @@ from MeetingSummary.main import MeetingSummary
 
 ms = MeetingSummary()
 
+f = open("Recording.txt", 'a', encoding='UTF-8')
+
 st.title("Audio Demo")
 st.write("Student screen")
 
-def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
-    return frame
 
 def audio_frame_callback(frame: av.AudioFrame) -> av.AudioFrame:
-    if ms.recording(frame.sample_rate, frame.to_ndarray()) : # sample_rate, raw_sound
-            # ms.summary() # return 값이 True일 경우 실행 = 10000개 chunk마다 실행
-            print(frame.sample_rate, frame.to_ndarray())
-            print(ms.translated_txt)
-            print()
-            print(ms.summarized_txt)
-            # st.write(ms.translated_txt)
-            # st.empty()
-            # st.write(ms.summarized_txt)
+    if ms.recording(frame.sample_rate, frame.to_ndarray()[0]) : # sample_rate, raw_sound(WAV)
+            ms.summary() # 40초마다 요약
+            f.write('translated: ' + ms.translated_txt + '\n')
+            f.write('summarized: ' + ms.summarized_txt + '\n\n')
+    return frame
     
 
-ctx = webrtc_streamer(key="Demo", 
-                      video_frame_callback=video_frame_callback,
-                      audio_frame_callback=audio_frame_callback)
+webrtc_streamer(key="Demo", audio_frame_callback=audio_frame_callback)
