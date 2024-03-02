@@ -40,20 +40,27 @@ class MeetingSummary:
         print("summary started")
         # STT
         try:
-            print(len(self.stream)/self.sr, '초')
-            self.translated_txt = self.transcriber({"sampling_rate": self.sr, "raw": self.stream})["text"]
-            print(self.translated_txt)
+            print(len(self.stream)/self.sr, '초 분량')
+            temp_stream = self.stream
             self.stream = None
+
+            self.translated_txt = self.transcriber({"sampling_rate": self.sr, "raw": temp_stream})["text"]
+            print(self.translated_txt)
             print("STT done")
-        except:
-            print("STT Errored")
+        except Exception as e:
+            print("STT Errored:", e)
 
         # LLM
         try:
             self.summarized_txt = self.GPT.askGPT(self.translated_txt)
             print("LLM done: ", self.summarized_txt)
-        except: 
-            print("LLM Errored")
+        except Exception as e:
+            print("LLM Errored:", e)
+
+        # Save the summarized meeting content to a text file
+        with open("Recording.txt", 'a', encoding='UTF-8') as f:
+            f.write('translated: ' + self.translated_txt + '\n')
+            f.write('summarized: ' + self.summarized_txt + '\n\n')
 
     def recording(self, sr, new_chunk):
         y = self.chunk_processing(new_chunk)
@@ -66,7 +73,7 @@ class MeetingSummary:
             self.stream = y
 
         elapsed_time = int(time.time()) - self.timer_start
-        if elapsed_time > 40:
+        if elapsed_time > 45:
             self.sr = sr * 2 # 왜인지 모르겠지만 sound_rate가 반으로 떨어져서 나와서 임의 조정.
             self.timer_start = int(time.time())
             return True

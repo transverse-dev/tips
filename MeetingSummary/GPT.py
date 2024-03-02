@@ -14,13 +14,14 @@ class GPT(object):
 
         # args
         self.token_budget = 4096 - 1024
+        self.history_token_budget = None
         self.text_history = []
         self.query = None
 
-    def num_tokens(self) -> int:
+    def num_tokens(self, query) -> int:
         # 문자열 토큰 수 반환
         encoding = encoding_for_model(self.GPT_MODEL)
-        return len(encoding.encode(self.query))
+        return len(encoding.encode(query))
     
     def get_history_messages(self) -> str:
         # 토큰 제한 안에서 history 최신 순으로 가져옴
@@ -40,6 +41,7 @@ class GPT(object):
         
         # 질의 저장
         self.query = query
+        self.history_token_budget = self.token_budget - self.num_tokens(query)
 
         # 데이터프레임과 임베딩을 활용해 GPT로 쿼리 응답 반환
         selected_text_history = self.get_history_messages()
