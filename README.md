@@ -53,7 +53,3 @@ https://youtu.be/-Euf2UuHqmw
 - Whisper Model 성능 향상 방안 : Whisper-Jax 모델 연구 || OpenAI Whisper API 사용
 - Streamlit-webrtc 네트워크 연결
 - STT 모델 API로 변경 (유료)
-
-# 마무리
-
-개발 기간이 늘어져서 죄송합니다. 두 달 동안 뜻 깊은 경험이었습니다. 다음에 다른 프로젝트에 불러주시면 지금보다 훨씬 성장한 모습으로 돌아오겠습니다. 감사합니다.
